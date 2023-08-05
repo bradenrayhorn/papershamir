@@ -15,6 +15,12 @@ The parts can be distributed in different physical locations. This method of sto
 can reduce the risk of losing the information due to natural disasters, misplaced paper, etc. while also
 reducing the risk of theft due to the fact multiple parts are required to reassemble the secret.
 
+## Security
+
+papershamir has not been audited.
+
+Anyone using papershamir should consider their individual thread model and use at their own risk.
+
 ## Installation
 
 ```bash
