@@ -17,7 +17,7 @@ func TestCombine(t *testing.T) {
 			[]byte("97 K7 E3A87326\n      E3A87326"),
 		}
 
-		result, err := Combine(shares)
+		result, err := Combine(shares, "")
 		is.NoErr(err)
 		is.Equal(string(result), "x")
 	})
@@ -29,7 +29,7 @@ func TestCombine(t *testing.T) {
 			[]byte("99 4E XNKN413A\n      XNKN413A"),
 		}
 
-		_, err := Combine(shares)
+		_, err := Combine(shares, "")
 		is.Equal(err.Error(), "less than two parts cannot be used to reconstruct the secret")
 	})
 
@@ -40,8 +40,20 @@ func TestCombine(t *testing.T) {
 			[]byte("99 4E XNKN413A"),
 		}
 
-		_, err := Combine(shares)
+		_, err := Combine(shares, "")
 		is.Equal(err.Error(), "share requires at least two lines. at share 1")
+	})
+
+	t.Run("handles invalid format", func(t *testing.T) {
+		is := is.New(t)
+
+		shares := [][]byte{
+			[]byte("99 4E\n      XNKN413A"),
+			[]byte("97 K7 E3A87326\n      E3A87326"),
+		}
+
+		_, err := Combine(shares, "")
+		is.Equal(err.Error(), "invalid format. at share 1 line 1")
 	})
 
 	t.Run("can detect line checksum failure", func(t *testing.T) {
@@ -52,7 +64,7 @@ func TestCombine(t *testing.T) {
 			[]byte("97 K7 E3A87326\n      E3A87326"),
 		}
 
-		_, err := Combine(shares)
+		_, err := Combine(shares, "")
 		is.Equal(err.Error(), "checksum failed. at share 1 line 1")
 	})
 
@@ -64,7 +76,7 @@ func TestCombine(t *testing.T) {
 			[]byte("97 K7 E3A87326\n      E3A87336"),
 		}
 
-		_, err := Combine(shares)
+		_, err := Combine(shares, "")
 		is.Equal(err.Error(), "share checksum failed. at share 2")
 	})
 
@@ -76,7 +88,7 @@ func TestCombine(t *testing.T) {
 			[]byte("97 K7 E3A87326\n      E3A87336"),
 		}
 
-		_, err := Combine(shares)
+		_, err := Combine(shares, "")
 		is.True(strings.Contains(err.Error(), "failed to decode at character 0"))
 	})
 
@@ -88,7 +100,7 @@ func TestCombine(t *testing.T) {
 			[]byte("97 K7 E3A87326\n      E3A87336"),
 		}
 
-		_, err := Combine(shares)
+		_, err := Combine(shares, "")
 		is.True(strings.Contains(err.Error(), "failed to decode at character 0"))
 	})
 

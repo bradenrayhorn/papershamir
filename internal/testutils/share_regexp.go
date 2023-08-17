@@ -6,33 +6,36 @@ import (
 )
 
 func CreateShareRegexp(expectedLines int, lineSize int, lastLineSize int) *regexp.Regexp {
-	checksum := "[[:alnum:]]{8}"
-	pairs := "(?:[[:alnum:]]{2} ){%d}"
+	fullLine := "(?:[[:alnum:]]{4} ){%d}(?:[[:alnum:]]{4}){%d}"
+	partialLine := "(?:[[:alnum:]]{4} ){%d}(?:[[:alnum:]]{2}){%d}"
 
 	reg := "(?m)"
 
 	// add full lines
 	for i := 0; i < expectedLines-1; i++ {
 		reg += fmt.Sprintf(
-			"^%s%s$\n",
-			fmt.Sprintf(pairs, lineSize),
-			checksum,
+			"^%s$\n",
+			fmt.Sprintf(fullLine, (lineSize+8)/4-1, 1),
 		)
 	}
 
 	// add last pairs line
-	reg += fmt.Sprintf(
-		"^%s[ ]{%d}%s$\n",
-		fmt.Sprintf(pairs, lastLineSize),
-		(lineSize-lastLineSize)*3,
-		checksum,
-	)
+	if (lastLineSize+8)%4 == 0 {
+		reg += fmt.Sprintf(
+			"^%s$\n",
+			fmt.Sprintf(fullLine, ((lastLineSize+8)/4)-1, ((lastLineSize+8)%4)/2+1),
+		)
+	} else {
+		reg += fmt.Sprintf(
+			"^%s$\n",
+			fmt.Sprintf(partialLine, ((lastLineSize+8)/4), ((lastLineSize+8)%4)/2),
+		)
+	}
 
 	// add final checksum line
 	reg += fmt.Sprintf(
-		"^[ ]{%d}%s$",
-		lineSize*3,
-		checksum,
+		"^%s$",
+		fmt.Sprintf(fullLine, 1, 1),
 	)
 
 	return regexp.MustCompile(reg)

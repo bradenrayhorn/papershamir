@@ -10,7 +10,7 @@ import (
 func TestCombine(t *testing.T) {
 	is := is.New(t)
 
-	in := bytes.NewBufferString("99 4E XNKN413A\n      XNKN413A\n\n97 K7 E3A87326\n      E3A87326")
+	in := bytes.NewBufferString("994E XNKN 413A\nXNKN 413A\n\n97K7 E3A8 7326\nE3A8 7326")
 	out := bytes.NewBufferString("")
 	cmd := CombineCmd{}
 	err := cmd.Run(&CmdContext{in, out})

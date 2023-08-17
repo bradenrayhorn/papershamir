@@ -23,6 +23,6 @@ func TestSplit(t *testing.T) {
 	is.Equal(len(shares), 2)
 
 	for _, share := range shares {
-		is.True(testutils.CreateShareRegexp(1, 2, 2).MatchString(share))
+		is.True(testutils.CreateShareRegexp(2, 40, 36).MatchString(share))
 	}
 }
