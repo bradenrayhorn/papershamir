@@ -1,0 +1,11 @@
+@import "./base.css";
+
+@media print {
+  .hide-in-print {
+    display: none;
+  }
+}
+
+.red {
+  color: red;
+}

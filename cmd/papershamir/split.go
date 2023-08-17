@@ -20,7 +20,7 @@ func (r *SplitCmd) Run(ctx *CmdContext) error {
 	}
 	secret = bytes.TrimSpace(secret)
 
-	shares, err := papershamir.Split(secret, r.Parts, r.Threshold)
+	shares, err := papershamir.Split(secret, r.Parts, r.Threshold, "test key")
 	if err != nil {
 		return err
 	}

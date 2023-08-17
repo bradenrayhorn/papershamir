@@ -17,7 +17,7 @@ func (r *CombineCmd) Run(ctx *CmdContext) error {
 	}
 	shares := bytes.Split(bytes.ReplaceAll(bytes.TrimSpace(input), []byte("\r"), []byte{}), []byte("\n\n"))
 
-	result, err := papershamir.Combine(shares)
+	result, err := papershamir.Combine(shares, "")
 	if err != nil {
 		return err
 	}

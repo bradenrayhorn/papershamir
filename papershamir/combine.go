@@ -7,11 +7,11 @@ import (
 	"github.com/hashicorp/vault/shamir"
 )
 
-func Combine(shares [][]byte) ([]byte, error) {
+func Combine(shares [][]byte, key string) ([]byte, error) {
 	decodedShares := make([][]byte, len(shares))
 
 	for i, share := range shares {
-		lines := strings.Split(string(share), "\n")
+		lines := strings.Split(strings.TrimSpace(string(share)), "\n")
 
 		if len(lines) < 2 {
 			return nil, fmt.Errorf("share requires at least two lines. at share %d", i+1)
@@ -19,9 +19,13 @@ func Combine(shares [][]byte) ([]byte, error) {
 
 		secret := ""
 		for j, line := range lines[:len(lines)-1] {
-			tokens := strings.Split(line, " ")
-			foundChecksum := tokens[len(tokens)-1]
-			foundSecret := strings.Join(tokens[:len(tokens)-1], "")
+			stripped := strings.ReplaceAll(line, " ", "")
+			if len(stripped) < 10 {
+				return nil, fmt.Errorf("invalid format. at share %d line %d", i+1, j+1)
+			}
+
+			foundChecksum := stripped[len(stripped)-8:]
+			foundSecret := stripped[:len(stripped)-8]
 			secret += foundSecret
 
 			// validate checksum for line
@@ -35,7 +39,7 @@ func Combine(shares [][]byte) ([]byte, error) {
 		}
 
 		// validate share checksum
-		shareChecksum := strings.TrimSpace(lines[len(lines)-1])
+		shareChecksum := strings.TrimSpace(strings.ReplaceAll(lines[len(lines)-1], " ", ""))
 		decodedChecksum, err := hexr.decode([]byte(shareChecksum))
 		if err != nil {
 			return nil, err
@@ -53,9 +57,22 @@ func Combine(shares [][]byte) ([]byte, error) {
 		decodedShares[i] = decodedSecret
 	}
 
-	result, err := shamir.Combine(decodedShares)
+	result, err := combineBytes(decodedShares, key)
 	if err != nil {
 		return nil, err
+	}
+
+	return result, nil
+}
+
+func combineBytes(shares [][]byte, key string) ([]byte, error) {
+	result, err := shamir.Combine(shares)
+	if err != nil {
+		return nil, err
+	}
+
+	if key != "" {
+		return encrypt.decrypt(key, result)
 	}
 
 	return result, nil
