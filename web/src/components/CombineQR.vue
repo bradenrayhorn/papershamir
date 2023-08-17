@@ -9,7 +9,9 @@ const key = ref("");
 const scannedCodes = ref([]);
 
 function build() {
-  secret.value = shamirCombineQR(scannedCodes.value, key.value);
+  if (scannedCodes.value.length > 1) {
+    secret.value = shamirCombineQR(scannedCodes.value, key.value);
+  }
 }
 
 const onError = (err) => {
@@ -23,9 +25,9 @@ const onDetect = (codes) => {
     return;
   }
   scannedCodes.value.push(string);
-  if (scannedCodes.value.length > 1) {
-    build();
-  }
+
+  build();
+
   error.value = "";
 };
 </script>
@@ -40,14 +42,7 @@ const onDetect = (codes) => {
 
     <div>
       <p>Encryption key:</p>
-      <input
-        v-model="key"
-        @input="build()"
-        style="width: 100%"
-        autocapitalize="off"
-        autocomplete="off"
-        autocorrect="off"
-      />
+      <SecretInput v-model="key" @input="build()" />
     </div>
 
     <div>
