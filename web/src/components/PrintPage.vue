@@ -47,8 +47,8 @@ function showKey() {
           gridTemplateRows: `repeat(${codes.length}, 1fr) 0 repeat(${codes.length}, 1fr)`,
         }"
       >
-        <div v-for="code in codes">
-          <div class="share">{{ code.code }}</div>
+        <div v-for="code in codes" class="share">
+          {{ code.code }}
         </div>
 
         <div class="pagebreak"></div>
@@ -79,9 +79,7 @@ function showKey() {
   font-size: 0.5rem;
 
   width: fit-content;
-  display: flex;
-  align-items: center;
-  height: 100%;
+  padding: 0.5rem 0;
 }
 
 .pagebreak {
@@ -93,13 +91,15 @@ function showKey() {
 .code-list {
   display: grid;
   grid-auto-rows: 1fr;
-  row-gap: 1rem;
+}
+
+.code-list > div {
+  display: flex;
+  align-items: center;
 }
 
 .code {
   text-align: right;
-  display: flex;
-  align-items: center;
   justify-content: flex-end;
 }
 
