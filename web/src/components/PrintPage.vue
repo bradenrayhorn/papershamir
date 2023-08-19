@@ -12,8 +12,8 @@ props.text.forEach((text, i) => {
   const string = props.qr[i];
   QRCode.toDataURL(string, { errorCorrectionLevel: "Q" }).then((url) => {
     qrSize.value = Math.round(url.length / 190);
-    if (qrSize.value < 48) {
-      qrSize.value = 48;
+    if (qrSize.value < 100) {
+      qrSize.value = 100;
     }
     codes.value[i] = {
       image: url,
