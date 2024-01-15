@@ -6,5 +6,5 @@ require (
 	github.com/alecthomas/kong v0.8.1
 	github.com/hashicorp/vault v1.14.8
 	github.com/matryer/is v1.4.1
-	golang.org/x/crypto v0.17.0
+	golang.org/x/crypto v0.18.0
 )
