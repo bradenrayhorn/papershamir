@@ -2,6 +2,8 @@ module github.com/bradenrayhorn/papershamir
 
 go 1.20
 
+retract v1.0.0
+
 require (
 	github.com/alecthomas/kong v0.9.0
 	github.com/hashicorp/vault v1.14.10
