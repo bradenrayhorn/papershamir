@@ -1,0 +1,28 @@
+{
+  "name": "papershamir",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@tsconfig/svelte": "^5.0.4",
+    "@types/qrcode": "^1.5.5",
+    "html5-qrcode": "^2.3.8",
+    "prettier": "^3.1.1",
+    "prettier-plugin-svelte": "^3.1.2",
+    "qrcode": "^1.5.4",
+    "svelte": "^4.2.18",
+    "svelte-check": "^3.8.5",
+    "svelte-spa-router": "^4.0.1",
+    "tslib": "^2.6.3",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1"
+  },
+  "type": "module"
+}

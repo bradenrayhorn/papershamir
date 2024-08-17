@@ -1,12 +1,21 @@
 package papershamir
 
 import (
+	"bytes"
+	"encoding/base64"
+	"errors"
+	"io"
+
 	"github.com/hashicorp/vault/shamir"
+	"github.com/klauspost/compress/zstd"
 )
 
 const maxLineSize = 40
 
-func Split(secret []byte, parts int, threshold int, key string) ([]string, error) {
+const prefixCompressed = byte('1')
+const prefixUncompressed = byte('2')
+
+func SplitHexr(secret []byte, parts int, threshold int, key string) ([]string, error) {
 	shares, err := splitBytes(secret, parts, threshold, key)
 	if err != nil {
 		return nil, err
@@ -41,7 +50,47 @@ func Split(secret []byte, parts int, threshold int, key string) ([]string, error
 	return formattedShares, nil
 }
 
+func SplitQR(secret []byte, parts int, threshold int, key string) ([]string, error) {
+	shares, err := splitBytes(secret, parts, threshold, key)
+	if err != nil {
+		return nil, err
+	}
+
+	formattedShares := make([]string, parts)
+	for j, share := range shares {
+		formattedShares[j] = string(base64.RawStdEncoding.EncodeToString(share))
+	}
+
+	return formattedShares, nil
+}
+
 func splitBytes(secret []byte, parts int, threshold int, key string) ([][]byte, error) {
+	// maybe compress
+	var b bytes.Buffer
+	encoder, err := zstd.NewWriter(&b, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = io.Copy(encoder, bytes.NewReader(secret))
+	if err != nil {
+		_ = encoder.Close()
+		return nil, err
+	}
+	if err := encoder.Close(); err != nil {
+		return nil, err
+	}
+
+	compressedSecret := b.Bytes()
+	if len(secret) == 0 {
+		return nil, errors.New("cannot split an empty secret")
+	} else if len(compressedSecret) < len(secret) {
+		secret = append([]byte{prefixCompressed}, compressedSecret...)
+	} else {
+		secret = append([]byte{prefixUncompressed}, secret...)
+	}
+
+	// encrypt
 	if key != "" {
 		encryptedSecret, err := encrypt.encrypt(key, secret)
 		if err != nil {
@@ -50,6 +99,7 @@ func splitBytes(secret []byte, parts int, threshold int, key string) ([][]byte, 
 		secret = encryptedSecret
 	}
 
+	// split
 	shares, err := shamir.Split(secret, parts, threshold)
 	if err != nil {
 		return nil, err

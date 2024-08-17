@@ -29,20 +29,31 @@ func shamirSplit(this js.Value, args []js.Value) any {
 	secret := args[0].String()
 	parts := args[1].Int()
 	threshold := args[2].Int()
-	shares, err := papershamir.Split([]byte(secret), parts, threshold, sanitizePassphrase(passphrase))
+
+	hexrShares, err := papershamir.SplitHexr([]byte(secret), parts, threshold, sanitizePassphrase(passphrase))
 	if err != nil {
 		return makeJsError(err)
 	}
 
+	textResult := make([]any, len(hexrShares), len(hexrShares))
+	for i := range hexrShares {
+		textResult[i] = hexrShares[i]
+	}
+
+	qrShares, err := papershamir.SplitQR([]byte(secret), parts, threshold, sanitizePassphrase(passphrase))
+	if err != nil {
+		return makeJsError(err)
+	}
+
+	qrResult := make([]any, len(qrShares), len(qrShares))
+	for i := range qrResult {
+		qrResult[i] = qrShares[i]
+	}
+
 	// assemble response
 	obj := map[string]any{}
-
-	res := make([]any, len(shares), len(shares))
-	for i := range shares {
-		res[i] = shares[i]
-	}
-	obj["text"] = res
-	obj["qr"] = res
+	obj["text"] = textResult
+	obj["qr"] = qrResult
 	obj["passphrase"] = passphrase
 
 	return js.ValueOf(obj)
@@ -52,7 +63,7 @@ func shamirCombine(this js.Value, args []js.Value) any {
 	input := []byte(args[0].String())
 	key := args[1].String()
 	shares := bytes.Split(bytes.ReplaceAll(bytes.TrimSpace(input), []byte("\r"), []byte{}), []byte("\n\n"))
-	secret, err := papershamir.Combine(shares, sanitizePassphrase(key))
+	secret, err := papershamir.CombineHexr(shares, sanitizePassphrase(key))
 	if err != nil {
 		return js.Global().Get("Error").New(err.Error())
 	}
@@ -67,7 +78,7 @@ func shamirCombineQR(this js.Value, args []js.Value) any {
 	for i := 0; i < input.Length(); i++ {
 		shares = append(shares, []byte(input.Index(i).String()))
 	}
-	secret, err := papershamir.Combine(shares, sanitizePassphrase(key))
+	secret, err := papershamir.CombineQR(shares, sanitizePassphrase(key))
 	if err != nil {
 		return js.Global().Get("Error").New(err.Error())
 	}
