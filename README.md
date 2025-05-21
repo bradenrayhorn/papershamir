@@ -1,6 +1,6 @@
 # archive notice
 
-This project is superceded by https://github.com/bradenrayhorn/paper-backup
+This project is superseded by https://github.com/bradenrayhorn/paper-backup
 
 # papershamir
 
