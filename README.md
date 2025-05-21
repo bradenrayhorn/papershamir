@@ -1,3 +1,7 @@
+# archive notice
+
+This project is superceded by https://github.com/bradenrayhorn/paper-backup
+
 # papershamir
 
 A CLI for securely splitting a secret into parts in a format easily writable on paper using Shamir's Secret Sharing.
